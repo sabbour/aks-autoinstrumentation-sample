@@ -55,8 +55,15 @@ function handleConnectionQuery(response: any) {
  **********************************************************************/
 const { MongoClient } = require("mongodb");
 const mongoHost = process.env["MONGO_HOST"] || "mongo";
-const uri = "mongodb://root:example@" + mongoHost +":27017/";
-let mongoClient: any;
+const mongoUri = "mongodb://" + mongoHost +":27017/";
+const mongoClient = new MongoClient(mongoUri);
+
+try {
+  await mongoClient.connect();
+  console.log("Connected to Mongo");
+} catch (error) {
+  console.error("Mongo error: " + error);
+}
 
 async function handleMongoConnection(response: any) {
   try {
@@ -79,12 +86,6 @@ async function handleMongoConnection(response: any) {
   }
 }
 
-try {
-  mongoClient = MongoClient.connect(uri);
-  console.log("Connected to Mongo");
-} catch (error) {
-  console.error("Mongo error: " + error);
-}
 /*********************************************************************
  *  POSTGRES SETUP
  **********************************************************************/
@@ -102,7 +103,7 @@ const pgClient = new Client({
   password: postgresPassword,
   port: postgresPort,
 });
-pgClient.connect();
+await pgClient.connect();
 console.log("Connected to Postgres");
 
 function handlePostgresConnection(response: any) {
