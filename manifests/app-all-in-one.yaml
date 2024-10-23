@@ -30,12 +30,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb
+  name: mongo
 spec:
   ports:
   - port: 27017
   selector:
-    app: mongodb
+    app: mongo
   type: ClusterIP    
 ---
 # Redis
@@ -233,6 +233,8 @@ spec:
           value: postgres
         - name: POSTGRES_DB
           value: test_db
+        - name: POSTGRES_PORT
+          value: 5432
         - name: MYSQL_HOST
           value: mysql
         - name: MYSQL_USER

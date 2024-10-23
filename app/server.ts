@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
 import * as http from "http";
 import * as mysql from "mysql";
 
@@ -9,6 +7,18 @@ let mongoClient: any;
 let pgClient: any;
 let redisClient: any;
 
+/**
+ * Initializes connections to various databases and starts the server.
+ * 
+ * This function performs the following steps:
+ * 1. Connects to a MySQL database.
+ * 2. Connects to a MongoDB database.
+ * 3. Connects to a PostgreSQL database.
+ * 4. Connects to a Redis database.
+ * 5. Starts the server on port 8080.
+ * 
+ * @returns {Promise<void>} A promise that resolves when the server has started.
+ */
 async function run() {
   mysqlClient = await connectToMySQL();
   mongoClient = await connectToMongo();
@@ -20,7 +30,18 @@ async function run() {
 
 run();
 
-
+/**
+ * Establishes a connection to a MySQL database using environment variables for configuration.
+ * 
+ * @returns {Promise<any>} A promise that resolves with the MySQL connection object if successful, 
+ *                         or rejects with an error if the connection fails.
+ * 
+ * Environment Variables:
+ * - `MYSQL_HOST`: The hostname of the MySQL server (default: "localhost").
+ * - `MYSQL_USER`: The username for the MySQL connection (default: "root").
+ * - `MYSQL_PASSWORD`: The password for the MySQL connection (default: "secret").
+ * - `MYSQL_DATABASE`: The name of the MySQL database to connect to (default: "").
+ */
 async function connectToMySQL() {
   const mysqlHost = process.env["MYSQL_HOST"] || "localhost";
   const mysqlUser = process.env["MYSQL_USER"] || "root";
@@ -48,6 +69,12 @@ async function connectToMySQL() {
   });
 }
 
+/**
+ * Establishes a connection to a MongoDB instance using the MongoClient from the 'mongodb' package.
+ * 
+ * @returns {Promise<any>} A promise that resolves with the MongoDB client object if successful,
+ *                         or rejects with an error if the connection fails.
+ */
 async function connectToMongo() {
   const { MongoClient } = require("mongodb");
   const mongoHost = process.env["MONGO_HOST"] || "mongo";
@@ -65,6 +92,19 @@ async function connectToMongo() {
   }
 }
 
+/**
+ * Establishes a connection to a PostgreSQL database using environment variables for configuration.
+ * 
+ * @returns {Promise<any>} A promise that resolves with the PostgreSQL client object if successful,
+ *                         or rejects with an error if the connection fails.
+ * 
+ * Environment Variables:
+ * - `POSTGRES_USER`: The username for the PostgreSQL database (default: "admin").
+ * - `POSTGRES_HOST`: The host address of the PostgreSQL database (default: "localhost").
+ * - `POSTGRES_DB`: The name of the PostgreSQL database (default: "test_db").
+ * - `POSTGRES_PASSWORD`: The password for the PostgreSQL database (default: "mypassword").
+ * - `POSTGRES_PORT`: The port number for the PostgreSQL database (default: 5432).
+ */
 async function connectToPostgres() {
   let postgresUser = process.env["POSTGRES_USER"] || "admin";
   let postgresHost = process.env["POSTGRES_HOST"] || "localhost";
@@ -90,6 +130,12 @@ async function connectToPostgres() {
   }
 }
 
+/**
+ * Establishes a connection to a Redis server.
+ * 
+ * @returns {Promise<any>} A promise that resolves with the Redis client object if successful,
+ *                         or rejects with an error if the connection fails.
+ */
 async function connectToRedis() {
   const { createClient } = require('redis');
   const redisClient = createClient({
@@ -106,6 +152,12 @@ async function connectToRedis() {
   return redisClient;
 }
 
+/**
+ * Handles a MySQL connection query and sends the response.
+ * 
+ * @param {any} response - The HTTP response object.
+ * @param {any} mysqlClient - The MySQL client object.
+ */
 function handleConnectionQuery(response: any, mysqlClient: any) {
   try {
     const query = 'SELECT 1 + 1 as solution';
@@ -122,6 +174,12 @@ function handleConnectionQuery(response: any, mysqlClient: any) {
   }
 }
 
+/**
+ * Handles a MongoDB connection query and sends the response.
+ * 
+ * @param {any} response - The HTTP response object.
+ * @param {any} mongoClient - The MongoDB client object.
+ */
 async function handleMongoConnection(response: any, mongoClient: any) {
   try {
     const myDB = mongoClient.db("myStateDB");
@@ -143,6 +201,12 @@ async function handleMongoConnection(response: any, mongoClient: any) {
   }
 }
 
+/**
+ * Handles a PostgreSQL connection query and sends the response.
+ * 
+ * @param {any} response - The HTTP response object.
+ * @param {any} pgClient - The PostgreSQL client object.
+ */
 function handlePostgresConnection(response: any, pgClient: any) {
   try {
     pgClient.query('SELECT NOW()', (err: any, res: any) => {
@@ -153,6 +217,12 @@ function handlePostgresConnection(response: any, pgClient: any) {
   }
 }
 
+/**
+ * Handles a Redis connection query and sends the response.
+ * 
+ * @param {any} response - The HTTP response object.
+ * @param {any} redisClient - The Redis client object.
+ */
 async function handleRedisConnection(response: any, redisClient: any) {
   try {
     await redisClient.set('mykey', 'Hello from node redis');
@@ -175,10 +245,11 @@ async function handleRedisConnection(response: any, redisClient: any) {
   }
 }
 
-/*********************************************************************
- *  HTTP SERVER SETUP
- **********************************************************************/
-/** Starts a HTTP server that receives requests on sample server port. */
+/**
+ * Starts an HTTP server that listens on the specified port.
+ * 
+ * @param {number} port - The port number on which the server will listen.
+ */
 function startServer(port: number) {
   console.log(`Starting HTTP server`);
   // Creates a server
@@ -194,7 +265,12 @@ function startServer(port: number) {
   }
 }
 
-/** A function which handles requests and send response. */
+/**
+ * Handles incoming HTTP requests and sends appropriate responses.
+ * 
+ * @param {any} request - The HTTP request object.
+ * @param {any} response - The HTTP response object.
+ */
 function handleRequest(request: any, response: any) {
   const body = [];
   request.on("error", (err: Error) => console.log(err));
@@ -246,7 +322,7 @@ function handleRequest(request: any, response: any) {
       );
       setTimeout(() => {
         this._requestTimedOut = true;
-        req.abort();
+        req.destroy();
       }, 2000);
 
       req.on("error", (error: Error) => {
