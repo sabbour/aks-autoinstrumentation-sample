@@ -232,5 +232,6 @@ function handleRequest(request: any, response: any) {
   });
 }
 
+const port = process.env.PORT || 8080;
 startServer(8080);
 
