@@ -224,7 +224,6 @@ function handlePostgresConnection(response: any, pgClient: any) {
  * @param {any} redisClient - The Redis client object.
  */
 async function handleRedisConnection(response: any, redisClient: any) {
-  try {
     await redisClient.set('mykey', 'Hello from node redis');
     await redisClient.get('mykey');
 
