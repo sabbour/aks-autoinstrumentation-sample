@@ -13,7 +13,7 @@
       ]
     },
     "include": [
-      "src/*.ts",
+      "*.ts", "server.ts", "client.ts",
     ],
     "exclude": [
       "node_modules"
