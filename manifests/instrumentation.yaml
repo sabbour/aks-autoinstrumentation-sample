@@ -6,5 +6,5 @@ spec:
   settings:
     autoInstrumentationPlatforms:
       - NodeJs
-    destination: 
-      applicationInsightsConnectionString: "" # Update with Azure App Insights connection string
+  destination: 
+    applicationInsightsConnectionString: "" # Update with Azure App Insights connection string
