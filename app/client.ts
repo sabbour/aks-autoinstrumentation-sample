@@ -7,7 +7,7 @@ import * as http from "http";
  **********************************************************************/
 /** A function which makes requests and handles response. */
 function makeRequest(path: string) {
-  http.get(
+  const req = http.get(
     {
       host: "server",
       port: 8080,
@@ -21,6 +21,10 @@ function makeRequest(path: string) {
       });
     }
   );
+
+  req.on("error", (err) => {
+    console.error(`Request error on path ${path}:`, err);
+  });
 }
 
 setInterval(() => {
@@ -31,5 +35,5 @@ setInterval(() => {
   makeRequest("/redis");
   makeRequest("/http");
   makeRequest("/exception");
-}, 10000)
+}, 3000)
 
