@@ -29,11 +29,11 @@ function makeRequest(path: string) {
 
 setInterval(() => {
   makeRequest("/");
-  makeRequest("/mysql");
-  makeRequest("/mongo");
-  makeRequest("/postgres");
-  makeRequest("/redis");
-  makeRequest("/http");
+  //makeRequest("/mysql");
+  //makeRequest("/mongo");
+  //makeRequest("/postgres");
+  //makeRequest("/redis");
+  //makeRequest("/http");
   //makeRequest("/exception");
 }, 3000)
 
