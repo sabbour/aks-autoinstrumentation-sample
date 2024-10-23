@@ -16,7 +16,7 @@
     "mysql": "^2.18.1",
     "pg": "^8.11.3",
     "redis": "^4.6.13",
-    "typescript": "^4.4.2"
+    "typescript": "^4.9.5"
   },
   "devDependencies": {
     "@types/mysql": "^2.15.21"

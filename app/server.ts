@@ -1,43 +1,115 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
-/*********************************************************************
- *  OPEN TELEMETRY SETUP
- **********************************************************************/
-
-// Open Telemetry setup need to happen before instrumented libraries are loaded
 import * as http from "http";
 import * as mysql from "mysql";
 
-/*********************************************************************
- *  MYSQL SETUP
- **********************************************************************/
-/** Connect to MySQL DB. */
-const mysqlHost = process.env["MYSQL_HOST"] || "localhost";
-const mysqlUser = process.env["MYSQL_USER"] || "root";
-const mysqlPassword = process.env["MYSQL_PASSWORD"] || "secret";
-const mysqlDatabase = process.env["MYSQL_DATABASE"] || "my_db";
+let mysqlClient: any;
+let server: http.Server;
+let mongoClient: any;
+let pgClient: any;
+let redisClient: any;
 
-const connection = mysql.createConnection({
-  host: mysqlHost,
-  user: mysqlUser,
-  password: mysqlPassword,
-  database: mysqlDatabase,
-});
+async function run() {
+  mysqlClient = await connectToMySQL();
+  mongoClient = await connectToMongo();
+  pgClient = await connectToPostgres();
+  redisClient = await connectToRedis();
+  const port = process.env.PORT || 8080;
+  startServer(8080);
+}
 
-connection.connect((err: any) => {
-  if (err) {
-    console.log("Failed to connect to DB, err:" + err);
+run();
+
+
+async function connectToMySQL() {
+  const mysqlHost = process.env["MYSQL_HOST"] || "localhost";
+  const mysqlUser = process.env["MYSQL_USER"] || "root";
+  const mysqlPassword = process.env["MYSQL_PASSWORD"] || "secret";
+  const mysqlDatabase = process.env["MYSQL_DATABASE"] || "my_db";
+
+  const connection = mysql.createConnection({
+    host: mysqlHost,
+    user: mysqlUser,
+    password: mysqlPassword,
+    database: mysqlDatabase,
+  });
+
+  return new Promise((resolve, reject) => {    
+    console.log("Connecting to MySQL");
+    connection.connect((err: any) => {
+      if (err) {
+        console.error("MySQL error: " + err);
+        reject(err);
+      } else {
+        console.info("MySQL connected");
+        resolve(connection);
+      }
+    });
+  });
+}
+
+async function connectToMongo() {
+  const { MongoClient } = require("mongodb");
+  const mongoHost = process.env["MONGO_HOST"] || "mongo";
+  const mongoUri = "mongodb://" + mongoHost + ":27017/";
+  const mongoClient = new MongoClient(mongoUri);
+
+  try {
+    console.log("Connecting to Mongo");
+    await mongoClient.connect();
+    console.info("Connected to Mongo");
+    return mongoClient;
+  } catch (error) {
+    console.error("Mongo error: " + error);
+    throw error;
   }
-  else {
-    console.info("MySQL connnected");
-  }
-});
+}
 
-function handleConnectionQuery(response: any) {
+async function connectToPostgres() {
+  let postgresUser = process.env["POSTGRES_USER"] || "admin";
+  let postgresHost = process.env["POSTGRES_HOST"] || "localhost";
+  let postgresDatabase = process.env["POSTGRES_DB"] || "test_db";
+  let postgresPassword = process.env["POSTGRES_PASSWORD"] || "mypassword";
+  let postgresPort = process.env["POSTGRES_PORT"] || 5432;
+  const { Client } = require('pg');
+  const pgClient = new Client({
+    user: postgresUser,
+    host: postgresHost,
+    database: postgresDatabase,
+    password: postgresPassword,
+    port: postgresPort,
+  });
+  console.log("Connecting to Postgres");
+  try {
+    await pgClient.connect();
+    console.info("Connected to Postgres");
+    return pgClient;
+  } catch (error) {
+    console.error("Postgres error: " + error);
+    throw error;
+  }
+}
+
+async function connectToRedis() {
+  const { createClient } = require('redis');
+  const redisClient = createClient({
+    url: 'redis://redis:6379'
+  });
+
+  redisClient.on('error', (err: Error) => {
+    console.log('Redis error: ', err)
+    throw err;
+  });
+  console.log("Connecting to Redis");
+  await redisClient.connect();
+  console.info("Connected to Redis");
+  return redisClient;
+}
+
+function handleConnectionQuery(response: any, mysqlClient: any) {
   try {
     const query = 'SELECT 1 + 1 as solution';
-    connection.query(query, (err: any, results: any, _fields: any) => {
+    mysqlClient.query(query, (err: any, results: any, _fields: any) => {
       if (err) {
         console.log('Error code:', err.code);
         response.end(err.message);
@@ -50,22 +122,7 @@ function handleConnectionQuery(response: any) {
   }
 }
 
-/*********************************************************************
- *  MONGO SETUP
- **********************************************************************/
-const { MongoClient } = require("mongodb");
-const mongoHost = process.env["MONGO_HOST"] || "mongo";
-const mongoUri = "mongodb://" + mongoHost +":27017/";
-const mongoClient = new MongoClient(mongoUri);
-
-try {
-  await mongoClient.connect();
-  console.log("Connected to Mongo");
-} catch (error) {
-  console.error("Mongo error: " + error);
-}
-
-async function handleMongoConnection(response: any) {
+async function handleMongoConnection(response: any, mongoClient: any) {
   try {
     const myDB = mongoClient.db("myStateDB");
     const myColl = myDB.collection("states");
@@ -86,27 +143,7 @@ async function handleMongoConnection(response: any) {
   }
 }
 
-/*********************************************************************
- *  POSTGRES SETUP
- **********************************************************************/
-let postgresUser = process.env["POSTGRES_USER"] || "admin";
-let postgresHost = process.env["POSTGRES_HOST"] || "localhost";
-let postgresDatabase = process.env["POSTGRES_DB"] || "test_db";
-let postgresPassword = process.env["POSTGRES_PASSWORD"] || "mypassword";
-let postgresPort = process.env["POSTGRES_PORT"] || 5432;
-
-const { Client } = require('pg');
-const pgClient = new Client({
-  user: postgresUser,
-  host: postgresHost,
-  database: postgresDatabase,
-  password: postgresPassword,
-  port: postgresPort,
-});
-await pgClient.connect();
-console.log("Connected to Postgres");
-
-function handlePostgresConnection(response: any) {
+function handlePostgresConnection(response: any, pgClient: any) {
   try {
     pgClient.query('SELECT NOW()', (err: any, res: any) => {
       response.end(`Postgres connected and queried at ${res.rows[0].now}`)
@@ -115,19 +152,8 @@ function handlePostgresConnection(response: any) {
     response.end("Postgres error: " + error);
   }
 }
-/*********************************************************************
- *  REDIS SETUP
- **********************************************************************/
-const { createClient } = require('redis');
-const redisClient = createClient({
-  url: 'redis://redis:6379'
-});
 
-redisClient.on('error', err => console.log('Redis error', err));
-await redisClient.connect();
-console.log("Connected to Redis");
-
-async function handleRedisConnection(response: any) {
+async function handleRedisConnection(response: any, redisClient: any) {
   try {
     await redisClient.set('mykey', 'Hello from node redis');
     const myKeyValue = await redisClient.get('mykey');
@@ -148,11 +174,11 @@ async function handleRedisConnection(response: any) {
     response.end("Error: " + error);
   }
 }
+
 /*********************************************************************
  *  HTTP SERVER SETUP
  **********************************************************************/
 /** Starts a HTTP server that receives requests on sample server port. */
-let server: http.Server;
 function startServer(port: number) {
   console.log(`Starting HTTP server`);
   // Creates a server
@@ -170,8 +196,6 @@ function startServer(port: number) {
 
 /** A function which handles requests and send response. */
 function handleRequest(request: any, response: any) {
-
-
   const body = [];
   request.on("error", (err: Error) => console.log(err));
   request.on("data", (chunk: string) => body.push(chunk));
@@ -181,16 +205,16 @@ function handleRequest(request: any, response: any) {
       response.end("Hello World!");
     }
     else if (request.url == '/mysql') {
-      handleConnectionQuery(response);
+      handleConnectionQuery(response, mysqlClient);
     }
     else if (request.url == '/mongo') {
-      handleMongoConnection(response);
+      handleMongoConnection(response, mongoClient);
     }
     else if (request.url == '/postgres') {
-      handlePostgresConnection(response);
+      handlePostgresConnection(response, pgClient);
     }
     else if (request.url == '/redis') {
-      handleRedisConnection(response);
+      handleRedisConnection(response, redisClient);
     }
     else if (request.url == '/http') {
       http.get(
@@ -232,7 +256,3 @@ function handleRequest(request: any, response: any) {
     }
   });
 }
-
-const port = process.env.PORT || 8080;
-startServer(8080);
-
