@@ -33,7 +33,7 @@ setInterval(() => {
   //makeRequest("/mongo");
   makeRequest("/postgres");
   makeRequest("/redis");
-  //makeRequest("/http");
+  makeRequest("/http");
   //makeRequest("/exception");
 }, 3000)
 
