@@ -118,13 +118,13 @@ function handlePostgresConnection(response: any) {
  *  REDIS SETUP
  **********************************************************************/
 const { createClient } = require('redis');
-const redisClient = createClient();
-try {
-  redisClient.connect();
-  console.log("Connected to Redis");
-} catch (error) {
-  console.error("Redis error: " + error);
-}
+const redisClient = createClient({
+  url: 'redis://redis:6379'
+});
+
+redisClient.on('error', err => console.log('Redis error', err));
+await redisClient.connect();
+console.log("Connected to Redis");
 
 async function handleRedisConnection(response: any) {
   try {
