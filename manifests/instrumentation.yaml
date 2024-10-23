@@ -7,4 +7,4 @@ spec:
     autoInstrumentationPlatforms:
       - NodeJs
   destination: 
-    applicationInsightsConnectionString: "InstrumentationKey=043b9656-883e-4935-8a81-50768da702f6;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=d462a113-5fdc-4c50-b588-fb1e61a7ab2d" # Update with Azure App Insights connection string
+    applicationInsightsConnectionString: "" # Update with Azure App Insights connection string
