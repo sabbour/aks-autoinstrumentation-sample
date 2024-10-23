@@ -5,14 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "server": "node -r dotenv/config out/server.js",
-    "client": "node -r dotenv/config out/client.js"
+    "server": "node -r out/server.js",
+    "client": "node -r out/client.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^16.9.1",
-    "dotenv": "^10.0.0",
     "mongodb": "^6.5.0",
     "mysql": "^2.18.1",
     "pg": "^8.11.3",

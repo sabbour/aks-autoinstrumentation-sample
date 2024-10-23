@@ -1,11 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// Load the .env file if it exists
-import * as dotenv from "dotenv";
-dotenv.config();
-
-
 /*********************************************************************
  *  OPEN TELEMETRY SETUP
  **********************************************************************/
