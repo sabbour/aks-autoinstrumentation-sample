@@ -14,8 +14,8 @@ async function run() {
   mongoClient = await connectToMongo();
   pgClient = await connectToPostgres();
   redisClient = await connectToRedis();
-  const port = process.env.PORT || 8080;
-  startServer(8080);
+  const port = 8080;
+  startServer(port);
 }
 
 run();
