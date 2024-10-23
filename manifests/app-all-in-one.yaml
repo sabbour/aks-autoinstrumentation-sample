@@ -192,6 +192,7 @@ spec:
       containers:
       - name: client
         image: ghcr.io/sabbour/aks-autoinstrumentation-sample-client:main
+        imagePullPolicy: Always
         resources:
           requests:
             cpu: 250m
@@ -215,6 +216,7 @@ spec:
       containers:
       - name: server
         image: ghcr.io/sabbour/aks-autoinstrumentation-sample-server:main
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http

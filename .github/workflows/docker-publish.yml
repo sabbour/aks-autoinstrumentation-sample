@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
       # https://github.com/docker/setup-buildx-action
@@ -81,7 +81,7 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: ./app
-          file: ./Client.dockerfile
+          file: ./Server.dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.metaserver.outputs.tags }}
           labels: ${{ steps.metaserver.outputs.labels }}
