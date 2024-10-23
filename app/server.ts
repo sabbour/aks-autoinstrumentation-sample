@@ -303,8 +303,8 @@ function handleRequest(request: any, response: any) {
         }
       );
     }
-   if (request.url == '/exception') {
-      let req = http.get(
+    if (request.url == '/exception') {
+      const req = http.get(
         {
           host: "test.com",
           port: "65530"
@@ -317,15 +317,14 @@ function handleRequest(request: any, response: any) {
           });
         }
       );
-      setTimeout(() => {
-        this._requestTimedOut = true;
-        req.abort();
-      }, 2000);
 
       req.on("error", (error: Error) => {
-        response.end("Done");
+        response.end("Done, but with an error: " + error);
       });
-      req.end();
+
+      setTimeout(function() {
+        req.destroy();
+      }, 2000);
     }
   });
 }
