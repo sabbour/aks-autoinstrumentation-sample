@@ -98,7 +98,7 @@ spec:
         "kubernetes.io/os": linux
       containers:
       - name: mysql
-        image: mysql:8.0-debian
+        image: mysql:5.7-debian
         ports:
         - containerPort: 3306
           name: mysql

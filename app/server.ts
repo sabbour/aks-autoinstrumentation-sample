@@ -25,7 +25,7 @@ async function connectToMySQL() {
   const mysqlHost = process.env["MYSQL_HOST"] || "localhost";
   const mysqlUser = process.env["MYSQL_USER"] || "root";
   const mysqlPassword = process.env["MYSQL_PASSWORD"] || "secret";
-  const mysqlDatabase = process.env["MYSQL_DATABASE"] || "my_db";
+  const mysqlDatabase = process.env["MYSQL_DATABASE"] || "";
 
   const connection = mysql.createConnection({
     host: mysqlHost,
