@@ -312,9 +312,6 @@ function handleRequest(request: any, response: any) {
         (res) => {
           const body: any = [];
           res.on("data", (chunk) => body.push(chunk));
-          res.on("end", () => {
-            response.end("Done");
-          });
         }
       );
 
