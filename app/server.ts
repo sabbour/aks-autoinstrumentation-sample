@@ -119,8 +119,12 @@ function handlePostgresConnection(response: any) {
  **********************************************************************/
 const { createClient } = require('redis');
 const redisClient = createClient();
-redisClient.connect();
-console.log("Connected to Redis");
+try {
+  redisClient.connect();
+  console.log("Connected to Redis");
+} catch (error) {
+  console.error("Redis error: " + error);
+}
 
 async function handleRedisConnection(response: any) {
   try {
@@ -149,12 +153,18 @@ async function handleRedisConnection(response: any) {
 /** Starts a HTTP server that receives requests on sample server port. */
 let server: http.Server;
 function startServer(port: number) {
+  console.log(`Starting HTTP server`);
   // Creates a server
   server = http.createServer(handleRequest);
   // Starts the server
-  server.listen(port, () => {
-    console.log(`Node HTTP listening on ${port}`);
-  });
+  try {
+    server.listen(port, () => {
+      console.log(`Node HTTP listening on ${port}`);
+    });
+  }
+  catch (error) {
+    console.error("HTTP error: " + error);
+  }
 }
 
 /** A function which handles requests and send response. */
