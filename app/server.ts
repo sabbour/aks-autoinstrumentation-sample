@@ -322,7 +322,7 @@ function handleRequest(request: any, response: any) {
       );
       setTimeout(() => {
         this._requestTimedOut = true;
-        req.destroy();
+        req.abort();
       }, 2000);
 
       req.on("error", (error: Error) => {
