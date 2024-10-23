@@ -34,6 +34,6 @@ setInterval(() => {
   makeRequest("/postgres");
   makeRequest("/redis");
   makeRequest("/http");
-  //makeRequest("/exception");
-}, 3000)
+  makeRequest("/exception");
+}, 10000)
 

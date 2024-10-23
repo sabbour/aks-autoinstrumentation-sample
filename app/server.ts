@@ -192,9 +192,6 @@ async function handleMongoConnection(response: any, mongoClient: any) {
     const insertManyresult = await myColl.insertMany(docs);
     let ids = insertManyresult.insertedIds;
     console.log(`${insertManyresult.insertedCount} documents were inserted.`);
-    for (let id of Object.values(ids)) {
-      console.log(`Inserted a document with id ${id}`);
-    }
   } catch (error) {
     console.error("Error: " + error);
     response.end("Error code: ", error.code);
