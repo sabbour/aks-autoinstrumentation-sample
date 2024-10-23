@@ -226,10 +226,10 @@ function handlePostgresConnection(response: any, pgClient: any) {
 async function handleRedisConnection(response: any, redisClient: any) {
   try {
     await redisClient.set('mykey', 'Hello from node redis');
-    const myKeyValue = await redisClient.get('mykey');
-    console.log(myKeyValue);
+    await redisClient.get('mykey');
 
-    const numAdded = await redisClient.zAdd('vehicles', [
+    const key = 'vehicles';
+    const members = [
       {
         score: 4,
         value: 'car',
@@ -238,11 +238,12 @@ async function handleRedisConnection(response: any, redisClient: any) {
         score: 2,
         value: 'bike',
       },
-    ]);
-    response.end(`Added ${numAdded} items.`);
-  } catch (error) {
-    response.end("Error: " + error);
-  }
+    ];
+
+    await redisClient.zadd(key, ...members, (err: Error, numAdded: number) => {
+      if (err) throw err;
+      console.log(`Number of elements added: ${numAdded}`);
+    });
 }
 
 /**
