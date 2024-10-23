@@ -1,0 +1,10 @@
+apiVersion: monitor.azure.com/v1
+kind: Instrumentation
+metadata:
+  name: demoappinsturmentation
+spec:
+  settings:
+    autoInstrumentationPlatforms:
+      - NodeJs
+    destination: 
+      applicationInsightsConnectionString: "" # Update with Azure App Insights connection string

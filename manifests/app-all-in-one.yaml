@@ -1,0 +1,175 @@
+# MongoDB
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+spec:
+  serviceName: mongo
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: mongo
+        image: mcr.microsoft.com/mirror/docker/library/mongo:5
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        resources:
+          requests:
+            cpu: 500m
+            memory: 75Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  ports:
+  - port: 27017
+  selector:
+    app: mongodb
+  type: ClusterIP    
+---
+# Redis
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: redis
+        image: mcr.microsoft.com/mirror/docker/library/redis:7.2
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          requests:
+            cpu: 500m
+            memory: 75Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: redis
+  type: ClusterIP
+---
+# MySQL
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  serviceName: mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: mysql
+        image: mysql:8.0-debian
+        ports:
+        - containerPort: 3306
+          name: mysql
+        env:
+        - name: MYSQL_USER
+          value: testuser
+        - name: MYSQL_PASSWORD
+          value: testpassword
+        - name: MYSQL_ROOT_PASSWORD
+          value: testpassword
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "1"
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  type: ClusterIP
+---
+# PostgreSQL
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: postgresql
+        image: postgres:17
+        ports:
+        - containerPort: 5432
+          name: postgresql
+        env:
+        - name: POSTGRES_USER
+          value: admin
+        - name: POSTGRES_PASSWORD
+          value: mypassword
+        - name: POSTGRES_DB
+          value: test_db
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: postgres
+  type: ClusterIP

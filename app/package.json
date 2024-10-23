@@ -1,0 +1,25 @@
+{
+  "name": "aks-autoinsturmentation-example",
+  "version": "1.0.0",
+  "description": "AKS Application Insights autoinstrumentation Node.js example",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "server": "node -r dotenv/config out/server.js",
+    "client": "node -r dotenv/config out/client.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^16.9.1",
+    "dotenv": "^10.0.0",
+    "mongodb": "^6.5.0",
+    "mysql": "^2.18.1",
+    "pg": "^8.11.3",
+    "redis": "^4.6.13",
+    "typescript": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/mysql": "^2.15.21"
+  }
+}
