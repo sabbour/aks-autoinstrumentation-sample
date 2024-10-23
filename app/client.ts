@@ -30,7 +30,7 @@ function makeRequest(path: string) {
 setInterval(() => {
   makeRequest("/");
   makeRequest("/mysql");
-  //makeRequest("/mongo");
+  makeRequest("/mongo");
   //makeRequest("/postgres");
   //makeRequest("/redis");
   //makeRequest("/http");
