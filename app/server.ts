@@ -59,7 +59,8 @@ function handleConnectionQuery(response: any) {
  *  MONGO SETUP
  **********************************************************************/
 const { MongoClient } = require("mongodb");
-const uri = "mongodb://root:example@localhost:27017/";
+const mongoHost = process.env["MONGO_HOST"] || "mongo";
+const uri = "mongodb://root:example@" + mongoHost +":27017/";
 let mongoClient: any;
 
 async function handleMongoConnection(response: any) {

@@ -9,7 +9,7 @@ import * as http from "http";
 function makeRequest(path: string) {
   http.get(
     {
-      host: "localhost",
+      host: "server",
       port: 8080,
       path: path,
     },

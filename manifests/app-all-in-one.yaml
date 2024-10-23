@@ -173,3 +173,80 @@ spec:
   selector:
     app: postgres
   type: ClusterIP
+---
+# Client aks-autoinstrumentation-sample-client:main
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+      - name: client
+        image: ghcr.io/sabbour/aks-autoinstrumentation-sample-client:main
+        resources:
+          requests:
+            cpu: 250m
+            memory: 128Mi
+---
+# Server aks-autoinstrumentation-sample-server:main
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+      - name: server
+        image: ghcr.io/sabbour/aks-autoinstrumentation-sample-server:main
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          requests:
+            cpu: 250m
+            memory: 128Mi
+        env:
+        - name: POSTGRES_USER
+          value: admin
+        - name: POSTGRES_PASSWORD
+          value: mypassword
+        - name: POSTGRES_HOST
+          value: postgres
+        - name: POSTGRES_DB
+          value: test_db
+        - name: MYSQL_HOST
+          value: mysql
+        - name: MYSQL_USER
+          value: testuser
+        - name: MYSQL_PASSWORD
+          value: testpassword
+        - name: MONGO_HOST
+          value: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: server
+  type: ClusterIP
